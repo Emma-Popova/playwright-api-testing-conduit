@@ -1,0 +1,22 @@
+{
+  "name": "playwright-api-testing-conduit",
+  "version": "1.0.0",
+  "description": "Playwright + TypeScript API testing project for the Conduit application, covering REST API requests, authentication, CRUD operations, and response validation.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Emma-Popova/playwright-api-testing-conduit.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Emma-Popova/playwright-api-testing-conduit/issues"
+  },
+  "homepage": "https://github.com/Emma-Popova/playwright-api-testing-conduit#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.3.0"
+  }
+}
