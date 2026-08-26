@@ -1,4 +1,7 @@
-[
-  "Automation",
-  "Playwright"
-]
+   
+   {
+    "tags": [
+        "Automation",
+        "Playwright"
+        ]
+      }
