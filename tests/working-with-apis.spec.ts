@@ -42,4 +42,19 @@ test('Delete article', async({page, request})=>{
       const responseLoginJSON = await loginResponse.json();
       const token = responseLoginJSON.user.token;
 
+      const newArticleResponse = await request.post('https://conduit-api.bondaracademy.com/api/articles/',{
+     data:  {
+        "article": {
+            "title": "Test New Article Title",
+            "description": "Test-Description",
+            "body": "Test-Body-Text",
+            "tagList": []
+          }
+         },
+         headers: {
+            Authorization: `Token ${token}`
+         }
+      })
+      expect(newArticleResponse.status()).toEqual(201);
+    
 })
