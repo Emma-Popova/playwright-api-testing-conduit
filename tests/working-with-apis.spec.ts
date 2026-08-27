@@ -42,12 +42,13 @@ test('Delete article', async({page, request})=>{
       const responseLoginJSON = await loginResponse.json();
       const token = responseLoginJSON.user.token;
 
-        const newArticleResponse = await request.post(
-    'https://conduit-api.bondaracademy.com/api/articles/',
+      const articleTitle = `Test New Article ${Date.now()}`;
+      const newArticleResponse = await request.post('https://conduit-api.bondaracademy.com/api/articles/',
     {
+    
         data: {
         article: {
-            title: `Test New Article ${Date.now()}`,
+            title: articleTitle,
             description: 'Test-Description',
             body: 'Test-Body-Text',
             tagList: []
@@ -58,7 +59,26 @@ test('Delete article', async({page, request})=>{
         }
     }
     );
-      expect(newArticleResponse.status()).toEqual(201);
+    expect(newArticleResponse.status()).toEqual(201);
+    console.log(await newArticleResponse.json());
+
+    await page.goto('https://conduit.bondaracademy.com/');
+    // The test app does not refresh the article list after API creation.
+    // UI login is used as a workaround to reload the latest data.
+    await page.getByText('Sign in').click();
+    await page.getByRole('textbox', { name: 'Email' }).fill(process.env.TEST_EMAIL!);
+    await page.getByRole('textbox', { name: 'Password' }).fill(process.env.TEST_PASSWORD!);   
+    await page.getByRole('button', {name: 'Sign in'}).click();
+
+
     
-})
+    await expect(page.getByText(articleTitle)).toBeVisible();
+    await page.getByText(articleTitle).click();
+    await page.getByRole('button',{name: 'Delete Article'}).first().click(); 
+    await page.waitForResponse('https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0');
+    await expect(page.getByText(articleTitle)).not.toBeVisible();
+   
+
+    });
+
 
