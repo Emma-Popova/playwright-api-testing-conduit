@@ -70,15 +70,55 @@ test('Delete article', async({page, request})=>{
     await page.getByRole('textbox', { name: 'Password' }).fill(process.env.TEST_PASSWORD!);   
     await page.getByRole('button', {name: 'Sign in'}).click();
 
-
-    
     await expect(page.getByText(articleTitle)).toBeVisible();
     await page.getByText(articleTitle).click();
     await page.getByRole('button',{name: 'Delete Article'}).first().click(); 
     await page.waitForResponse('https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0');
     await expect(page.getByText(articleTitle)).not.toBeVisible();
    
+  });
 
-    });
+  test('Create article', async({page, request})=>{
+    await page.goto('https://conduit.bondaracademy.com/');
+    await page.getByText('Sign in').click();
+    await page.getByRole('textbox', { name: 'Email' }).fill(process.env.TEST_EMAIL!);
+    await page.getByRole('textbox', { name: 'Password' }).fill(process.env.TEST_PASSWORD!);   
+    await page.getByRole('button', {name: 'Sign in'}).click();
+
+    const articleTitle = `Test-Create new Article - Title ${Date.now()}`;
+    await page.getByText('New Article').click();
+    await page.getByRole('textbox', {name: 'Article Title'}).fill(articleTitle);
+    await page.getByRole('textbox', {name: 'What\'s this article about?'}).fill('About Test-create Article');
+    await page.getByRole('textbox', {name: 'Write your article (in markdown)'}).fill('Tets123');
+    await page.getByRole('button', {name: ' Publish Article '}).click();
+    const createArticleResponse = await page.waitForResponse('https://conduit-api.bondaracademy.com/api/articles/');
+    const createArticleResponseJSON = await createArticleResponse.json();
+    const slugID = createArticleResponseJSON.article.slug;
+
+
+    await expect(page.getByText(articleTitle)).toBeVisible();
+    await page.getByText('Home').first().click();
+    await expect(page.getByText(articleTitle)).toBeVisible();
+
+    const loginResponse = await request.post('https://conduit-api.bondaracademy.com/api/users/login',{
+       data: {
+         "user": {
+            "email": process.env.TEST_EMAIL,
+            "password": process.env.TEST_PASSWORD
+           }
+         }
+      })
+      expect((loginResponse).status()).toEqual(200);
+      const responseLoginJSON = await loginResponse.json();
+      const token = responseLoginJSON.user.token;
+
+      const deleteResponse = await request.delete(`https://conduit-api.bondaracademy.com/api/articles/${slugID}`, {
+        headers: {
+            Authorization: `Token ${token}`
+            }
+        })
+        expect(deleteResponse.status()).toEqual(204);
+
+  })
 
 
